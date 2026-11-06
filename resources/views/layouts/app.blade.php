@@ -34,7 +34,7 @@
                 </div>
 
                 <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
-                    <p class="eyebrow mb-3 px-3 !text-grey-500">{{ $user->role->label() }}</p>
+                    <p class="eyebrow mb-3 px-3 !text-grey-500">{{ __('Menu') }}</p>
                     @foreach (\App\Support\Navigation::for($user) as $item)
                         @php($active = request()->routeIs($item['active']))
                         <a href="{{ route($item['route']) }}" wire:navigate
@@ -53,50 +53,58 @@
                     @endforeach
                 </nav>
 
-                <div class="border-t border-charcoal-muted/70 p-4">
-                    <a href="{{ route('profile') }}" wire:navigate class="focus-ring flex items-center gap-3 rounded-md p-2 transition hover:bg-charcoal">
+                {{-- Signed-in account: who you are, account settings and log out --}}
+                <div class="border-t border-charcoal-muted/70 p-3">
+                    <p class="eyebrow mb-2 px-3 pt-1 !text-grey-500">{{ __('Your account') }}</p>
+
+                    <div class="flex items-center gap-3 px-3 py-2">
                         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-champagne-500/15 font-serif text-lg text-champagne-300">
                             {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
                         </span>
                         <span class="min-w-0">
                             <span class="block truncate text-sm text-ivory-50">{{ $user->name }}</span>
-                            <span class="block truncate text-xs text-grey-400">{{ $user->email }}</span>
+                            <span class="block truncate text-xs text-champagne-400">{{ $user->role->label() }}</span>
                         </span>
-                    </a>
+                    </div>
+
+                    <div class="mt-1 space-y-0.5">
+                        @php($onAccount = request()->routeIs('profile'))
+                        <a href="{{ route('profile') }}" wire:navigate
+                           @class([
+                               'focus-ring relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition',
+                               'bg-charcoal-soft text-ivory-50' => $onAccount,
+                               'text-grey-300 hover:bg-charcoal hover:text-ivory-50' => ! $onAccount,
+                           ])
+                           @if ($onAccount) aria-current="page" @endif>
+                            @if ($onAccount)
+                                <span class="absolute inset-y-2 left-0 w-0.5 rounded-full bg-champagne-500"></span>
+                            @endif
+                            <x-ui.icon name="user" @class(['h-[18px] w-[18px]', 'text-champagne-400' => $onAccount]) />
+                            {{ __('Account settings') }}
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="focus-ring flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm text-grey-300 transition hover:bg-charcoal hover:text-ivory-50">
+                                <x-ui.icon name="logout" class="h-[18px] w-[18px]" />
+                                {{ __('Log out') }}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </aside>
 
             {{-- Main column --}}
             <div class="lg:pl-64">
-                <header class="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-grey-200/70 bg-ivory-50/90 px-4 backdrop-blur sm:px-6 lg:px-10">
-                    <button type="button" class="focus-ring -ml-1 rounded p-1.5 text-charcoal lg:hidden"
+                {{-- Mobile-only top bar: account controls live in the sidebar --}}
+                <header class="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-grey-200/70 bg-ivory-50/90 px-4 backdrop-blur sm:px-6 lg:hidden">
+                    <button type="button" class="focus-ring -ml-1 rounded p-1.5 text-charcoal"
                             x-on:click="sidebarOpen = true" aria-label="{{ __('Open menu') }}">
                         <x-ui.icon name="menu" />
                     </button>
 
-                    <x-application-logo class="text-[13px] text-ink lg:hidden" :tagline="null" />
+                    <x-application-logo class="text-[13px] text-ink" :tagline="null" />
 
-                    <div class="ml-auto flex items-center gap-2">
-                        <x-dropdown align="right" width="56">
-                            <x-slot name="trigger">
-                                <button type="button" class="focus-ring flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-charcoal transition hover:bg-ivory-200">
-                                    <span class="hidden sm:inline">{{ $user->name }}</span>
-                                    <x-ui.badge tone="gold">{{ $user->role->label() }}</x-ui.badge>
-                                </button>
-                            </x-slot>
-                            <x-slot name="content">
-                                <x-dropdown-link :href="route('profile')" wire:navigate>
-                                    <x-ui.icon name="user" class="h-4 w-4 text-grey-500" /> {{ __('Account settings') }}
-                                </x-dropdown-link>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="flex w-full items-center gap-2.5 px-4 py-2 text-start text-sm text-charcoal transition hover:bg-ivory-100 focus:bg-ivory-100 focus:outline-none">
-                                        <x-ui.icon name="logout" class="h-4 w-4 text-grey-500" /> {{ __('Log out') }}
-                                    </button>
-                                </form>
-                            </x-slot>
-                        </x-dropdown>
-                    </div>
+                    <x-ui.badge tone="gold" class="ml-auto">{{ $user->role->label() }}</x-ui.badge>
                 </header>
 
                 <main class="mx-auto max-w-shell px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
