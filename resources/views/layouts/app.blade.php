@@ -53,49 +53,63 @@
                     @endforeach
                 </nav>
 
-                {{-- Signed-in account: who you are; click to reveal account actions --}}
+                {{-- Signed-in account: who you are; click to open account actions upwards --}}
                 @php($onAccount = request()->routeIs('profile'))
-                <div class="border-t border-charcoal-muted/70 p-3" x-data="{ accountOpen: @js($onAccount) }">
+                <div class="border-t border-charcoal-muted/70 p-3"
+                     x-data="{ accountOpen: false }"
+                     x-on:keydown.escape="accountOpen = false">
                     <p class="eyebrow mb-2 px-3 pt-1 !text-grey-500">{{ __('Your account') }}</p>
 
-                    <button type="button"
-                            class="focus-ring flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition hover:bg-charcoal"
-                            x-on:click="accountOpen = ! accountOpen"
-                            :aria-expanded="accountOpen.toString()"
-                            aria-controls="account-actions">
-                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-champagne-500/15 font-serif text-lg text-champagne-300">
-                            {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
-                        </span>
-                        <span class="min-w-0 flex-1">
-                            <span class="block truncate text-sm text-ivory-50">{{ $user->name }}</span>
-                            <span class="block truncate text-xs text-champagne-400">{{ $user->role->label() }}</span>
-                        </span>
-                        <x-ui.icon name="chevron-right" class="h-4 w-4 shrink-0 text-grey-400 transition-transform duration-200"
-                                   x-bind:class="accountOpen && 'rotate-90'" />
-                        <span class="sr-only">{{ __('Show account actions') }}</span>
-                    </button>
+                    <div class="relative" x-on:click.outside="accountOpen = false">
+                        {{-- Actions panel: opens above the account row --}}
+                        <div id="account-actions"
+                             x-show="accountOpen" x-cloak
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="translate-y-1 opacity-0"
+                             x-transition:enter-end="translate-y-0 opacity-100"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100"
+                             x-transition:leave-end="translate-y-1 opacity-0"
+                             class="absolute inset-x-0 bottom-full mb-2 space-y-0.5 rounded-lg border border-charcoal-muted bg-charcoal p-1.5 shadow-lift">
+                            <a href="{{ route('profile') }}" wire:navigate
+                               @class([
+                                   'focus-ring relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition',
+                                   'bg-charcoal-soft text-ivory-50' => $onAccount,
+                                   'text-grey-300 hover:bg-charcoal-soft hover:text-ivory-50' => ! $onAccount,
+                               ])
+                               @if ($onAccount) aria-current="page" @endif>
+                                @if ($onAccount)
+                                    <span class="absolute inset-y-2 left-0 w-0.5 rounded-full bg-champagne-500"></span>
+                                @endif
+                                <x-ui.icon name="user" @class(['h-[18px] w-[18px]', 'text-champagne-400' => $onAccount]) />
+                                {{ __('Account settings') }}
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="focus-ring flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm text-grey-300 transition hover:bg-charcoal-soft hover:text-ivory-50">
+                                    <x-ui.icon name="logout" class="h-[18px] w-[18px]" />
+                                    {{ __('Log out') }}
+                                </button>
+                            </form>
+                        </div>
 
-                    <div id="account-actions" class="mt-1 space-y-0.5" x-show="accountOpen" x-collapse @unless ($onAccount) x-cloak @endunless>
-                        <a href="{{ route('profile') }}" wire:navigate
-                           @class([
-                               'focus-ring relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition',
-                               'bg-charcoal-soft text-ivory-50' => $onAccount,
-                               'text-grey-300 hover:bg-charcoal hover:text-ivory-50' => ! $onAccount,
-                           ])
-                           @if ($onAccount) aria-current="page" @endif>
-                            @if ($onAccount)
-                                <span class="absolute inset-y-2 left-0 w-0.5 rounded-full bg-champagne-500"></span>
-                            @endif
-                            <x-ui.icon name="user" @class(['h-[18px] w-[18px]', 'text-champagne-400' => $onAccount]) />
-                            {{ __('Account settings') }}
-                        </a>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="focus-ring flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm text-grey-300 transition hover:bg-charcoal hover:text-ivory-50">
-                                <x-ui.icon name="logout" class="h-[18px] w-[18px]" />
-                                {{ __('Log out') }}
-                            </button>
-                        </form>
+                        <button type="button"
+                                class="focus-ring flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition hover:bg-charcoal"
+                                :class="accountOpen && 'bg-charcoal'"
+                                x-on:click="accountOpen = ! accountOpen"
+                                :aria-expanded="accountOpen.toString()"
+                                aria-controls="account-actions">
+                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-champagne-500/15 font-serif text-lg text-champagne-300">
+                                {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
+                            </span>
+                            <span class="min-w-0 flex-1">
+                                <span class="block truncate text-sm text-ivory-50">{{ $user->name }}</span>
+                                <span class="block truncate text-xs text-champagne-400">{{ $user->role->label() }}</span>
+                            </span>
+                            <x-ui.icon name="chevron-right" class="h-4 w-4 shrink-0 text-grey-400 transition-transform duration-200"
+                                       x-bind:class="accountOpen && '-rotate-90'" />
+                            <span class="sr-only">{{ __('Show account actions') }}</span>
+                        </button>
                     </div>
                 </div>
             </aside>
