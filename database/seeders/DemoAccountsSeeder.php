@@ -10,7 +10,8 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 
 /**
- * Local/demo accounts. All passwords are "password". Never run in production.
+ * Local/demo accounts with placeholder contact details. All passwords are
+ * "password". Never run in production.
  */
 class DemoAccountsSeeder extends Seeder
 {
@@ -19,12 +20,12 @@ class DemoAccountsSeeder extends Seeder
         $studios = [
             [
                 'name' => 'Amani Wanjiru', 'email' => 'amani@studio.test',
-                'studio' => 'Amani Light Studio', 'city' => 'Nairobi',
+                'studio' => 'Amani Light Studio', 'city' => 'Nairobi', 'phone' => '+254 700 000 001',
                 'tagline' => 'Honest light, lasting stories.', 'instagram' => '@amanilight',
             ],
             [
                 'name' => 'Baraka Otieno', 'email' => 'baraka@studio.test',
-                'studio' => 'Lakeside Frames', 'city' => 'Kisumu',
+                'studio' => 'Lakeside Frames', 'city' => 'Kisumu', 'phone' => '+254 700 000 002',
                 'tagline' => 'Weddings and portraits by the lake.', 'instagram' => '@lakesideframes',
             ],
         ];
@@ -35,6 +36,7 @@ class DemoAccountsSeeder extends Seeder
             $profile = PhotographerProfile::updateOrCreate(['user_id' => $user->id], [
                 'studio_name' => $data['studio'],
                 'email' => $data['email'],
+                'phone' => $data['phone'],
                 'city' => $data['city'],
             ]);
 
@@ -44,6 +46,7 @@ class DemoAccountsSeeder extends Seeder
                     'brand_name' => $data['studio'],
                     'tagline' => $data['tagline'],
                     'email' => $data['email'],
+                    'phone' => $data['phone'],
                     'social_links' => ['instagram' => $data['instagram']],
                 ])
                 ->save();
