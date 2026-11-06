@@ -48,7 +48,7 @@ class Customer extends Model
             $user->isAdmin() => $query,
             $user->isPhotographer() => $query->where(
                 'photographer_profile_id',
-                $user->photographerProfile?->id ?? 0,
+                $user->photographerProfile->id ?? 0,
             ),
             $user->isCustomer() => $query->where('user_id', $user->id),
             default => $query->whereRaw('1 = 0'),

@@ -15,8 +15,8 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        $email = (string) env('SEED_ADMIN_EMAIL', 'admin@yuppy.test');
-        $password = env('SEED_ADMIN_PASSWORD');
+        $email = (string) config('yuppy.seed_admin.email');
+        $password = config('yuppy.seed_admin.password');
 
         if (blank($password)) {
             if (app()->isProduction()) {

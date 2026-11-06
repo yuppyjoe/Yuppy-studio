@@ -34,7 +34,7 @@ class PhotobookProjectFactory extends Factory
     {
         return $this->state(fn () => [
             'owner_type' => ProjectOwnerType::Photographer,
-            'photographer_profile_id' => $profile?->id ?? PhotographerProfile::factory(),
+            'photographer_profile_id' => $profile->id ?? PhotographerProfile::factory(),
             'branding_mode' => BrandingMode::Photographer,
         ]);
     }
@@ -43,7 +43,7 @@ class PhotobookProjectFactory extends Factory
     {
         return $this->state(fn () => [
             'owner_type' => ProjectOwnerType::Customer,
-            'customer_id' => $customer?->id ?? Customer::factory(),
+            'customer_id' => $customer->id ?? Customer::factory(),
             'branding_mode' => BrandingMode::Yuppy,
         ]);
     }

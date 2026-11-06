@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\BrandingProfile;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -44,7 +46,25 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function admin(): User
 {
-    // ..
+    return User::factory()->admin()->create();
+}
+
+/** A photographer user with a studio profile (and optional branding). */
+function photographer(bool $withBranding = false): User
+{
+    $user = User::factory()->photographer()->create();
+
+    if ($withBranding) {
+        BrandingProfile::factory()->create(['photographer_profile_id' => $user->photographerProfile->id]);
+    }
+
+    return $user->refresh();
+}
+
+/** A self-registered customer user with their customer record. */
+function customerUser(): User
+{
+    return User::factory()->customer()->create()->refresh();
 }

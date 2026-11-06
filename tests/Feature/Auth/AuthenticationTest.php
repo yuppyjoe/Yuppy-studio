@@ -43,30 +43,44 @@ test('users can not authenticate with invalid password', function () {
     $this->assertGuest();
 });
 
-test('navigation menu can be rendered', function () {
-    $user = User::factory()->create();
+test('the app shell renders for signed-in users', function () {
+    $user = User::factory()->customer()->create();
 
-    $this->actingAs($user);
-
-    $response = $this->get('/dashboard');
-
-    $response
+    $this->actingAs($user)
+        ->get(route('customer.dashboard'))
         ->assertOk()
-        ->assertSeeVolt('layout.navigation');
+        ->assertSee($user->name)
+        ->assertSee(route('logout'));
 });
 
 test('users can logout', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user);
-
-    $component = Volt::test('layout.navigation');
-
-    $component->call('logout');
-
-    $component
-        ->assertHasNoErrors()
+    $this->actingAs($user)
+        ->post(route('logout'))
         ->assertRedirect('/');
 
+    $this->assertGuest();
+});
+
+test('suspended users cannot log in', function () {
+    $user = User::factory()->suspended()->create();
+
+    Volt::test('pages.auth.login')
+        ->set('form.email', $user->email)
+        ->set('form.password', 'password')
+        ->call('login')
+        ->assertHasErrors('form.email');
+
+    $this->assertGuest();
+});
+
+test('a user suspended mid-session is signed out on the next request', function () {
+    $user = User::factory()->customer()->create();
+    $this->actingAs($user);
+
+    $user->forceFill(['status' => 'suspended'])->save();
+
+    $this->get(route('customer.dashboard'))->assertRedirect(route('login'));
     $this->assertGuest();
 });

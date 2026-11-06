@@ -1,3 +1,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        @apply bg-ivory-50 font-sans text-[15px] leading-relaxed text-charcoal;
+    }
+
+    h1, h2, h3, .font-display {
+        @apply font-serif font-medium tracking-tight text-ink;
+    }
+
+    ::selection {
+        @apply bg-champagne-200 text-ink;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    .eyebrow {
+        @apply text-[11px] font-medium uppercase tracking-eyebrow text-grey-500;
+    }
+
+    .focus-ring {
+        @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-champagne-500 focus-visible:ring-offset-2 focus-visible:ring-offset-ivory-50;
+    }
+
+    .field {
+        @apply block w-full rounded-md border-grey-200 bg-white px-3.5 py-2.5 text-[15px] text-ink shadow-none placeholder:text-grey-400 transition
+            focus:border-charcoal focus:ring-1 focus:ring-charcoal
+            disabled:cursor-not-allowed disabled:bg-grey-50 disabled:text-grey-500;
+    }
+
+    .field-invalid {
+        @apply border-danger focus:border-danger focus:ring-danger;
+    }
+
+    .link {
+        @apply font-medium text-ink underline decoration-champagne-400 decoration-1 underline-offset-4 transition hover:decoration-ink;
+    }
+
+    .table-head {
+        @apply px-5 py-3 text-left text-[11px] font-medium uppercase tracking-eyebrow text-grey-500;
+    }
+
+    .table-cell {
+        @apply px-5 py-4 align-middle text-sm text-charcoal;
+    }
+}

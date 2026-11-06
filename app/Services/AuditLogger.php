@@ -46,7 +46,14 @@ class AuditLogger
      */
     public function logChanges(string $event, Model $subject, ?User $actor = null): ?AuditLog
     {
-        $changes = Arr::except($subject->getChanges(), ['updated_at', 'created_at']);
+        $ignored = ['id', 'updated_at', 'created_at'];
+
+        // A record created by this save: everything is new.
+        if ($subject->wasRecentlyCreated && $subject->getChanges() === []) {
+            return $this->log($event, $subject, [], Arr::except($subject->getAttributes(), $ignored), $actor);
+        }
+
+        $changes = Arr::except($subject->getChanges(), $ignored);
 
         if ($changes === []) {
             return null;

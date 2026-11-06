@@ -37,25 +37,15 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+    <p class="eyebrow mb-3">{{ __('Password reset') }}</p>
+    <h1 class="text-4xl">{{ __('Forgot your password?') }}</h1>
+    <p class="mt-2 text-sm text-grey-500">{{ __('Enter your email and we will send you a link to choose a new one.') }}</p>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <x-auth-session-status class="mt-8" :status="session('status')" />
 
-    <form wire:submit="sendPasswordResetLink">
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
+    <form wire:submit="sendPasswordResetLink" class="mt-8 space-y-5">
+        <x-ui.input name="email" id="email" :label="__('Email')" type="email" wire:model="email" required autofocus />
+        <x-ui.button class="w-full" size="lg" wire:loading.attr="disabled">{{ __('Email reset link') }}</x-ui.button>
+        <p class="text-center text-sm"><a href="{{ route('login') }}" wire:navigate class="link">{{ __('Back to sign in') }}</a></p>
     </form>
 </div>

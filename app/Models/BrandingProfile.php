@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * A photographer's studio brand, or (photographer_profile_id = null,
  * is_yuppy = true) the single Yuppy house brand.
+ *
+ * @property array<string, string>|null $social_links
  */
 #[Fillable(['brand_name', 'tagline', 'email', 'phone', 'website', 'social_links'])]
 class BrandingProfile extends Model
@@ -70,7 +72,7 @@ class BrandingProfile extends Model
             $user->isAdmin() => $query,
             $user->isPhotographer() => $query->where(
                 'photographer_profile_id',
-                $user->photographerProfile?->id ?? 0,
+                $user->photographerProfile->id ?? 0,
             ),
             default => $query->whereRaw('1 = 0'),
         };

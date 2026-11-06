@@ -36,23 +36,18 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
-    </div>
+    <p class="eyebrow mb-3">{{ __('One more step') }}</p>
+    <h1 class="text-4xl">{{ __('Verify your email') }}</h1>
+    <p class="mt-3 text-sm text-grey-500">
+        {{ __('We sent a verification link to your email address. Click it to activate your account. If it has not arrived, we can send another.') }}
+    </p>
 
     @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
-        </div>
+        <x-auth-session-status class="mt-6" :status="__('A new verification link has been sent to your email address.')" />
     @endif
 
-    <div class="mt-4 flex items-center justify-between">
-        <x-primary-button wire:click="sendVerification">
-            {{ __('Resend Verification Email') }}
-        </x-primary-button>
-
-        <button wire:click="logout" type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            {{ __('Log Out') }}
-        </button>
+    <div class="mt-8 flex flex-wrap items-center justify-between gap-4">
+        <x-ui.button type="button" wire:click="sendVerification" wire:loading.attr="disabled">{{ __('Resend verification email') }}</x-ui.button>
+        <x-ui.button type="button" variant="ghost" wire:click="logout">{{ __('Log out') }}</x-ui.button>
     </div>
 </div>
