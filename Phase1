@@ -1,0 +1,59 @@
+You are a senior Laravel engineer. We are building "Yuppy AI Photobook Designer" on the TALL stack (Tailwind, Alpine.js, Laravel, Livewire 3). This is PHASE 1 ONLY: Foundation & Architecture. Do not build AI, uploads of photographs, the editor, renderer, orders or payments.
+
+STEP 0 - Inspect first
+Inspect the repository and environment (PHP, Composer, Node, MySQL). If no Laravel app exists, create one (Laravel 11 or the compatible version). Summarise what you found and your plan in /docs/architecture.md before writing feature code.
+
+STEP 1 - Setup
+- Livewire 3, Alpine.js, Tailwind CSS via Vite, MySQL.
+- Laravel Breeze with the Livewire (Volt) stack for auth: register, login, logout, password reset, email verification.
+- Pest for tests, Laravel Pint, Larastan (level 5).
+- Queue driver: database. Filesystem: private disk for all user files.
+- Self-hosted fonts: one elegant serif for headings, one clean sans for body.
+- Do not install Konva, Fabric or any editor library yet.
+
+STEP 2 - Roles
+- users.role enum: admin, photographer, customer. Plus status and last_login_at.
+- Customers and photographers may self-register (role chosen at registration, admin cannot be self-registered). Admins are seeded.
+- Role middleware and Laravel policies. No role logic scattered in views.
+
+STEP 3 - Database
+Create migrations, models, factories and relationships with proper foreign keys and indexes for: users, photographer_profiles, customers, branding_profiles, occasions, design_families, book_formats, manufacturer_templates, photobook_projects (stub), ai_requests (empty), audit_logs.
+manufacturer_templates must have nullable measurement columns and is_verified=false by default. NEVER seed or invent manufacturer measurements.
+photobook_projects: owner_type (yuppy|photographer|customer), photographer_profile_id nullable, customer_id nullable, branding_mode, occasion_id, book_format_id, title, status, soft deletes.
+
+STEP 4 - Authorisation (critical)
+- Policies: PhotographerProfile, BrandingProfile, Customer, PhotobookProject.
+- Photographers can only access their own records. Customers only their own. Admin all.
+- Lists must be owner-filtered by default.
+- A photographer-owned project must never resolve Yuppy branding. Implement a BrandingResolver service with this rule and test it.
+- Files (logos) are stored privately and served only through authenticated, policy-checked routes.
+
+STEP 5 - Features
+- Role-based dashboards: admin, photographer, customer, sharing one app shell (sidebar + top bar, responsive, collapsible on mobile).
+- Photographer: studio profile + branding profile form (studio name, phone, email, optional website, socials, logo upload with validation: image types only, size limit, no SVG with scripts).
+- Admin: manage Yuppy branding profile; list photographers and customers (read-only for now).
+- AuditLogger service; log login, logout, profile and branding changes.
+
+STEP 6 - UI
+Design tokens in tailwind.config: charcoal, black, warm ivory, champagne gold (accent only), neutral greys. Serif headings, sans body, generous whitespace. Build reusable Blade/Livewire components: card, button variants, input, select, file upload, modal, toast, badge, empty state. Premium creative-studio feel, not a generic admin template. No heavy gradients, no unnecessary animation.
+
+STEP 7 - Seeders
+Admin user, 2 photographers (each with branding), 2 customers, 8 occasions (Wedding, Engagement, Graduation, Birthday, Family, Travel, Corporate Portfolio, Baby/Newborn), 5 design families (Story, Minimal, Moments, Cinematic, Signature), 6 book formats (8x10 P, 8x12 P, 12x8 L, 10x12 P, 12x12 Square, 12x18 P), Yuppy branding profile with placeholder logo. Occasions and families must be data, not hard-coded in views.
+
+STEP 8 - Tests (Pest)
+- Each role lands on its own dashboard.
+- Customer gets 403 on admin and photographer routes.
+- Photographer A cannot view, edit, list or download Photographer B's profile, branding, customers, projects or logo.
+- Logo upload rejects invalid type and oversize files.
+- BrandingResolver: photographer project never returns Yuppy branding.
+- Seeders produce 8 occasions, 5 families, 6 formats, and zero verified manufacturer templates.
+- Audit entries are written for login and profile changes.
+
+STEP 9 - Docs
+Write /docs/architecture.md, /docs/roadmap.md (10 phases) and /docs/phase-1.md (how to run, test, and what is next).
+
+RULES
+- Work incrementally; commit-sized steps. Run tests after each step and fix failures.
+- No placeholder buttons that do nothing. Everything visible must work.
+- Do not invent technical measurements or API keys.
+- When done, report: what was implemented, how to run and test, test results, known gaps, and the recommended next task (Phase 2: Design Engine).
